@@ -477,7 +477,20 @@
 								formData.append(k, n.uploadFile.data[k])
 							}
 						}
-						f._ajax.send(el, formData, f._itFc);
+						if(n.uploadFile.S3 && n.uploadFile.signUrl){
+							var fileType = f._itFc.file.type.split('/');
+							$.post(n.uploadFile.signUrl, { filename: f._itFc.file.name, mimeType: fileType[0], mimeName: fileType[1] }, function (result) {
+									n.uploadFile.contentType = f._itFc.file.type;	
+									n.uploadFile.url = result.url;				 
+									f._ajax.send(el, formData, f._itFc);
+							}).fail(function () {
+								alert('error: signing failed');
+							});
+							
+							
+						}else {
+							f._ajax.send(el, formData, f._itFc);
+						}
 					},
 					_ajax: {
 						send: function(el, formData, c) {
